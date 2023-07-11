@@ -1,5 +1,5 @@
-import { IUserRepository } from 'assets/interfaces/repositories/IUserRepository';
-import { User, UserCredentials } from '../interfaces/models/User';
+import { IUserRepository } from '../repositories/UserRepository';
+import { User, UserCredentials } from '../models/User';
 
 class UserController {
   private userRepository: IUserRepository;

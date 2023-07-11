@@ -1,5 +1,9 @@
-import { User, UserCredentials } from 'assets/interfaces/models/User';
-import { IUserRepository } from 'assets/interfaces/repositories/IUserRepository';
+import { User, UserCredentials } from '../models/User';
+
+interface IUserRepository {
+  getUserByEmail(email: string): User;
+  createUser(credentials: UserCredentials): User;
+}
 
 class UserRepository implements IUserRepository {
   getUserByEmail(email: string): User {
@@ -10,4 +14,4 @@ class UserRepository implements IUserRepository {
   }
 }
 
-export { UserRepository };
+export { IUserRepository, UserRepository };
