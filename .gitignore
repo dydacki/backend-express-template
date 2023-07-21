@@ -3,3 +3,8 @@ node_modules
 
 # Generate output
 dist
+
+# Logs and databases
+[Ll]og
+[Ll]ogs
+*.[Ll]og
