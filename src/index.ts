@@ -9,6 +9,7 @@ import mongoose from 'mongoose';
 import { config } from './config/envConfig';
 import { configureLogging } from './config/log4jsConfig';
 import { getErrorHandler, getLoggingHandler, requestRuleHandler } from './middleware/handlers';
+import defaultRoutes from './routes/index';
 
 configureLogging();
 const logger = getLogger();
@@ -19,7 +20,7 @@ const startServer = () => {
     .use(express.json())
     .use(getLoggingHandler(logger))
     .use(requestRuleHandler)
-    .get('/ping', (request: Request, response: Response) => response.status(200).json({ message: 'pong' }))
+    .get('/ping', defaultRoutes)
     .use(getErrorHandler(logger));
 
   http.createServer(app).listen(config.server.port, () => logger.info(`Server running on port ${config.server.port}`));

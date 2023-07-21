@@ -13,7 +13,7 @@ const requestRuleHandler = (request: Request, response: Response, next: NextFunc
   next();
 };
 
-const getErrorHandler = (logger: Logger) => (request: Request, response: Response) => {
+const getErrorHandler = (logger: Logger) => (_: Request, response: Response) => {
   let error = new Error('Not found');
   logger.error(error.message);
   response.status(404).json({
