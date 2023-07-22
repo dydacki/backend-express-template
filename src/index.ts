@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { getLogger } from 'log4js';
 import cors from 'cors';
 import http from 'http';
@@ -8,8 +8,9 @@ import compression from 'compression';
 import mongoose from 'mongoose';
 import { config } from './config/envConfig';
 import { configureLogging } from './config/log4jsConfig';
-import { getErrorHandler, getLoggingHandler, requestRuleHandler } from './middleware/handlers';
+import { getErrorHandler, getLoggingHandler, requestRuleHandler } from './middleware/requestHandlers';
 import defaultRoutes from './routes/index';
+import userRoutes from './routes/user';
 
 configureLogging();
 const logger = getLogger();
@@ -20,7 +21,8 @@ const startServer = () => {
     .use(express.json())
     .use(getLoggingHandler(logger))
     .use(requestRuleHandler)
-    .get('/ping', defaultRoutes)
+    .use('/api/users', userRoutes)
+    .use('/ping', defaultRoutes)
     .use(getErrorHandler(logger));
 
   http.createServer(app).listen(config.server.port, () => logger.info(`Server running on port ${config.server.port}`));

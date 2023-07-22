@@ -1,17 +1,27 @@
 import { Document, Schema, model } from 'mongoose';
+import { v4 as newId } from 'uuid';
 
 export interface User {
-  userName: string;
   email: string;
+  userName: string;
   password: string;
+  verificationCode: string;
+  passwordResetCode: string | null;
+  verified: boolean;
 }
 
 const UserSchema: Schema = new Schema(
   {
+    email: { type: String, required: true, unique: true },
     userName: { type: String, required: true, unique: true },
+    password: { type: String, required: true, select: false },
+    verificationCode: { type: String, required: true, default: () => newId() },
+    passwordResetCode: { type: String, required: false, default: null },
+    verified: { type: Boolean, required: true, default: false },
   },
   {
     versionKey: false,
+    timestamps: true,
   },
 );
 
