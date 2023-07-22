@@ -5,7 +5,7 @@ import http from 'http';
 import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import compression from 'compression';
-import mongoose from 'mongoose';
+import { connectToDatabase } from './mongo';
 import { config } from './config/envConfig';
 import { configureLogging } from './config/log4jsConfig';
 import { getErrorHandler, getLoggingHandler, requestRuleHandler } from './middleware/requestHandlers';
@@ -28,8 +28,7 @@ const startServer = () => {
   http.createServer(app).listen(config.server.port, () => logger.info(`Server running on port ${config.server.port}`));
 };
 
-mongoose
-  .connect(config.mongo.url, { retryWrites: true, w: 'majority' })
+connectToDatabase()
   .then(() => {
     logger.info('Connected to Mongo instance.');
     startServer();
