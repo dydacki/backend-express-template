@@ -1,6 +1,9 @@
-import { Request, Response, Router } from 'express';
+import { Router } from 'express';
+import { createUser } from '../controllers/userController';
+import { validateResource } from '../middleware/validationHandler';
+import { signInUserSchema } from '../schemas/userSchemas';
 
 const router = Router();
-router.post('/', (request: Request, response: Response) => response.status(200).json({ message: 'OK' }));
+router.post('/', validateResource(signInUserSchema), createUser);
 
 export default router;
