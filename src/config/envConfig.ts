@@ -14,4 +14,11 @@ export const config = {
   server: {
     port: SERVER_PORT,
   },
+  smtp: {
+    host: 'smtp.ethereal.email',
+    port: 587,
+    user: 'wlv67bittlpcb6rv@ethereal.email',
+    password: 'ZpawtzW1DjmmuTrNHD',
+    secure: false,
+  },
 };

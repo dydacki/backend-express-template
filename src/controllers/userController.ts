@@ -2,6 +2,7 @@ import argon2 from 'argon2';
 import { Request, Response } from 'express';
 import { Types } from 'mongoose';
 import User from '../models/User';
+import { sendEmail } from '../shared/mailer';
 
 const createUser = async (request: Request, response: Response) => {
   const { email, userName, password } = request.body;
@@ -16,6 +17,7 @@ const createUser = async (request: Request, response: Response) => {
 
   return user
     .save()
+    .then(() => sendEmail())
     .then((user) => response.status(201).json({ user }))
     .catch((error) => {
       if (error.code === 11000) {
