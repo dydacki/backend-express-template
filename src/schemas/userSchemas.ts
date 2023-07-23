@@ -7,4 +7,9 @@ const createUserSchema = Joi.object({
   passwordConfirmation: Joi.string().required().valid(Joi.ref('password')).messages({ 'any.only': 'password confirmation must match the password' }),
 });
 
-export { createUserSchema };
+const verifyUserSchema = Joi.object({
+  userId: Joi.string().required(),
+  verificationCode: Joi.string().required(),
+});
+
+export { createUserSchema, verifyUserSchema };

@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { createUser } from '../controllers/userController';
-import { validateResource } from '../middleware/validationHandler';
-import { createUserSchema } from '../schemas/userSchemas';
+import { createUser, verifyUser } from '../controllers/userController';
+import { validateBodyResource, validateParamsResource } from '../middleware/validationHandler';
+import { createUserSchema, verifyUserSchema } from '../schemas/userSchemas';
 
 const router = Router();
-router.post('/', validateResource(createUserSchema), createUser);
-
+router.post('/', validateBodyResource(createUserSchema), createUser);
+router.post('/verify/', validateParamsResource(verifyUserSchema), verifyUser);
 export default router;

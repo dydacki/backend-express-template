@@ -17,6 +17,7 @@ export const config = {
   smtp: {
     host: 'smtp.ethereal.email',
     port: 587,
+    sender: 'noreply@backend-template.com',
     user: 'wlv67bittlpcb6rv@ethereal.email',
     password: 'ZpawtzW1DjmmuTrNHD',
     secure: false,
