@@ -2,8 +2,9 @@ import argon2 from 'argon2';
 import { Request, Response } from 'express';
 import { getLogger } from 'log4js';
 import { Types } from 'mongoose';
+import { v4 as newId } from 'uuid';
 import User from '../models/User';
-import { sendEmail, getVerificationEmailPayload } from '../shared/mailer';
+import { sendEmail, getPasswordResetEmailPayload, getVerificationEmailPayload } from '../shared/mailer';
 
 const logger = getLogger();
 
@@ -56,4 +57,29 @@ const verifyUser = async (request: Request, response: Response): Promise<Respons
     });
 };
 
-export { createUser, verifyUser };
+const requestPasswordReset = async (request: Request, response: Response): Promise<Response<any, Record<string, any>>> => {
+  const { email } = request.body;
+  const message = 'If a user with that email is registered you will receive a password reset email';
+
+  const user = await User.findOne({ email });
+  if (!user) {
+    logger.warn(`Password reset requested for non-existent user with email ${email}`);
+    return response.json({ message: message });
+  }
+
+  if (!user.verified) {
+    return response.json({ message: 'User is not verified' });
+  }
+
+  const passwordResetCode = newId();
+  user.passwordResetCode = passwordResetCode;
+  user
+    .save()
+    .then(() => sendEmail(getPasswordResetEmailPayload(user.email, user._id, passwordResetCode)).then(() => response.json({ message: message })))
+    .catch((error) => {
+      logger.error(JSON.stringify(error));
+      return response.status(500).json({ error });
+    });
+};
+
+export { createUser, requestPasswordReset, verifyUser };

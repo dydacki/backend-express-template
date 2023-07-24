@@ -12,4 +12,8 @@ const verifyUserSchema = Joi.object({
   verificationCode: Joi.string().required(),
 });
 
-export { createUserSchema, verifyUserSchema };
+const requestPasswordResetSchema = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+export { createUserSchema, verifyUserSchema, requestPasswordResetSchema };

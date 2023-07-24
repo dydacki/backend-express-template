@@ -21,6 +21,14 @@ const getVerificationEmailPayload = (email: string, userId: string, verification
   };
 };
 
+const getPasswordResetEmailPayload = (email: string, userId: string, passwordResetCode: string): EmailPayload => {
+  return {
+    recipient: email,
+    subject: 'Reset your password',
+    text: `Please reset your password by clicking the following link: http://localhost:${config.server.port}/api/users/reset-password?userId=${userId}&passwordResetCode=${passwordResetCode}`,
+  };
+};
+
 const sendEmail = async (payload: EmailPayload) => {
   transporter
     .sendMail({
@@ -31,7 +39,10 @@ const sendEmail = async (payload: EmailPayload) => {
     })
     .then((info: SMTPTransport.SentMessageInfo) => {
       logger.info(`Preview URL: ${getTestMessageUrl(info)}`);
+    })
+    .catch((error) => {
+      logger.error(JSON.stringify(error));
     });
 };
 
-export { getVerificationEmailPayload, sendEmail };
+export { getPasswordResetEmailPayload, getVerificationEmailPayload, sendEmail };
