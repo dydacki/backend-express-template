@@ -4,7 +4,7 @@ const createUserSchema = Joi.object({
   email: Joi.string().email().required(),
   userName: Joi.string().required(),
   password: Joi.string().required().min(9),
-  passwordConfirmation: Joi.string().required().valid(Joi.ref('password')).messages({ 'any.only': 'password confirmation must match the password' }),
+  passwordConfirmation: Joi.string().required().valid(Joi.ref('password')).messages({ 'any.only': 'password confirmation must match the password phrase' }),
 });
 
 const verifyUserSchema = Joi.object({
@@ -16,9 +16,14 @@ const requestPasswordResetSchema = Joi.object({
   email: Joi.string().email().required(),
 });
 
-const resetPasswordSchema = Joi.object({
+const resetPasswordQuerySchema = Joi.object({
   userId: Joi.string().required(),
   passwordResetCode: Joi.string().required(),
 });
 
-export { createUserSchema, verifyUserSchema, requestPasswordResetSchema, resetPasswordSchema };
+const resetPasswordBodySchema = Joi.object({
+  password: Joi.string().required().min(9),
+  passwordConfirmation: Joi.string().required().valid(Joi.ref('password')).messages({ 'any.only': 'password confirmation must match the password phrase' }),
+});
+
+export { createUserSchema, verifyUserSchema, requestPasswordResetSchema, resetPasswordQuerySchema, resetPasswordBodySchema };

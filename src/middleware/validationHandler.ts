@@ -24,4 +24,15 @@ const validateQueryResource = (schema: ObjectSchema) => async (request: Request,
   }
 };
 
-export { validateBodyResource, validateQueryResource };
+const validateResource = (querySchema: ObjectSchema, bodySchema: ObjectSchema) => async (request: Request, response: Response, next: NextFunction) => {
+  querySchema
+    .validateAsync(request.query)
+    .then(() => bodySchema.validateAsync(request.body))
+    .then(() => next())
+    .catch((error) => {
+      logger.error(error.message);
+      response.status(422).json({ message: error.message });
+    });
+};
+
+export { validateBodyResource, validateQueryResource, validateResource };
