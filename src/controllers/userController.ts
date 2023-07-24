@@ -1,8 +1,11 @@
 import argon2 from 'argon2';
 import { Request, Response } from 'express';
+import { getLogger } from 'log4js';
 import { Types } from 'mongoose';
 import User from '../models/User';
 import { sendEmail, getVerificationEmailPayload } from '../shared/mailer';
+
+const logger = getLogger();
 
 const createUser = async (request: Request, response: Response): Promise<Response<any, Record<string, any>>> => {
   const { email, userName, password } = request.body;
@@ -19,6 +22,7 @@ const createUser = async (request: Request, response: Response): Promise<Respons
     .save()
     .then((user) => sendEmail(getVerificationEmailPayload(user.email, user._id, user.verificationCode)).then(() => response.status(201).json({ user })))
     .catch((error) => {
+      logger.error(JSON.stringify(error));
       if (error.code === 11000) {
         return response.status(409).json({ message: 'User already exists' });
       }
@@ -26,8 +30,30 @@ const createUser = async (request: Request, response: Response): Promise<Respons
     });
 };
 
-const verifyUser = async (request: Request, response: Response) => {
-  response.status(200).json({ message: 'User verified' });
+const verifyUser = async (request: Request, response: Response): Promise<Response<any, Record<string, any>>> => {
+  const { userId, verificationCode } = request.query;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    return response.status(404).json({ message: 'User not found' });
+  }
+
+  if (user.verified) {
+    return response.json({ message: 'User already verified' });
+  }
+
+  if (user.verificationCode !== verificationCode) {
+    return response.status(400).json({ message: 'Verification codes do not match' });
+  }
+
+  user.verified = true;
+  user
+    .save()
+    .then(() => response.status(200).json({ message: 'User verified' }))
+    .catch((error) => {
+      logger.error(JSON.stringify(error));
+      return response.status(500).json({ error });
+    });
 };
 
 export { createUser, verifyUser };
