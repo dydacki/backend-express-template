@@ -14,7 +14,7 @@ const validateBodyResource = (schema: ObjectSchema) => async (request: Request, 
   }
 };
 
-const validateParamsResource = (schema: ObjectSchema) => async (request: Request, response: Response, next: NextFunction) => {
+const validateQueryResource = (schema: ObjectSchema) => async (request: Request, response: Response, next: NextFunction) => {
   try {
     await schema.validateAsync(request.query);
     next();
@@ -24,4 +24,4 @@ const validateParamsResource = (schema: ObjectSchema) => async (request: Request
   }
 };
 
-export { validateBodyResource, validateParamsResource };
+export { validateBodyResource, validateQueryResource };
