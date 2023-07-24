@@ -13,6 +13,14 @@ const transporter: Transporter<SMTPTransport.SentMessageInfo> = createTransport(
   },
 });
 
+const getVerificationEmailPayload = (email: string, userId: string, verificationCode: string): EmailPayload => {
+  return {
+    recipient: email,
+    subject: 'Please verify your account',
+    text: `Please verify your account by clicking the following link: http://localhost:${config.server.port}/api/users/verify?userId=${userId}&verificationCode=${verificationCode}`,
+  };
+};
+
 const sendEmail = async (payload: EmailPayload) => {
   transporter
     .sendMail({
@@ -26,4 +34,4 @@ const sendEmail = async (payload: EmailPayload) => {
     });
 };
 
-export { sendEmail };
+export { getVerificationEmailPayload, sendEmail };
