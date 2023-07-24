@@ -85,7 +85,28 @@ const requestPasswordReset = async (request: Request, response: Response): Promi
 // Promise<Response<any, Record<string, any>>>
 const resetPassword = async (request: Request, response: Response) => {
   const { userId, passwordResetCode } = request.query;
-  response.json({ userId, passwordResetCode });
+  const { password, _ } = request.body;
+
+  const user = await User.findById(userId);
+  if (!user) {
+    logger.warn(`Password reset requested for non-existent user with id ${userId}`);
+    return response.status(404).json({ message: 'User not found' });
+  }
+
+  if (user.passwordResetCode !== passwordResetCode) {
+    logger.warn(`Password reset requested for user with id ${userId} but the reset code does not match`);
+    return response.status(404).json({ message: 'Could not reset password' });
+  }
+
+  user.password = await argon2.hash(password as string);
+  user.passwordResetCode = null;
+  user
+    .save()
+    .then(() => response.status(200).json({ message: 'Password reset' }))
+    .catch((error) => {
+      logger.error(JSON.stringify(error));
+      return response.status(500).json({ error });
+    });
 };
 
 export { createUser, requestPasswordReset, resetPassword, verifyUser };
