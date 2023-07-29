@@ -8,3 +8,6 @@ dist
 [Ll]og
 [Ll]ogs
 *.[Ll]og
+
+#ssh keys
+ssh
