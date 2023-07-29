@@ -82,8 +82,7 @@ const requestPasswordReset = async (request: Request, response: Response): Promi
     });
 };
 
-// Promise<Response<any, Record<string, any>>>
-const resetPassword = async (request: Request, response: Response) => {
+const resetPassword = async (request: Request, response: Response): Promise<Response<any, Record<string, any>>> => {
   const { userId, passwordResetCode } = request.query;
   const { password, _ } = request.body;
 
