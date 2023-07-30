@@ -14,7 +14,7 @@ const UserSchema: Schema = new Schema(
   {
     email: { type: String, required: true, unique: true },
     userName: { type: String, required: true, unique: true },
-    password: { type: String, required: true, select: false },
+    password: { type: String, required: true },
     verificationCode: { type: String, required: true, default: () => newId() },
     passwordResetCode: { type: String, required: false, default: null },
     verified: { type: Boolean, required: true, default: false },

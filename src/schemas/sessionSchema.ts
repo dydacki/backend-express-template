@@ -1,8 +1,8 @@
 import Joi from 'joi';
 
 const createSessionSchema = Joi.object({
-  userName: Joi.string().required(),
-  valid: Joi.boolean().required().default(true),
+  login: Joi.string().email().required(),
+  password: Joi.string().min(8).required().messages({ 'any.only': 'invalid user or password' }),
 });
 
 export { createSessionSchema };

@@ -11,6 +11,7 @@ import { configureLogging } from './config/log4jsConfig';
 import { getErrorHandler, getLoggingHandler, requestRuleHandler } from './middleware/requestHandlers';
 import defaultRoutes from './routes/index';
 import userRoutes from './routes/user';
+import authenticationRoutes from './routes/authentication';
 
 configureLogging();
 const logger = getLogger();
@@ -21,6 +22,7 @@ const startServer = () => {
     .use(express.json())
     .use(getLoggingHandler(logger))
     .use(requestRuleHandler)
+    .use('/api/auth', authenticationRoutes)
     .use('/api/users', userRoutes)
     .use('/ping', defaultRoutes)
     .use(getErrorHandler(logger));
