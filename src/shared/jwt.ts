@@ -16,7 +16,12 @@ const signJwt = (object: Object, tokenKey: string, options?: SignOptions | undef
     ...(options && options),
   };
 
-  return jwt.sign(object, tokenKey, signOptions);
+  try {
+    return jwt.sign({ object }, tokenKey, signOptions);
+  } catch (error) {
+    logger.error('JWT signing failed', error);
+    return null;
+  }
 };
 
 const verifyJwt = <T>(token: string, tokenKey: string): T | null => {
@@ -24,13 +29,13 @@ const verifyJwt = <T>(token: string, tokenKey: string): T | null => {
     const decoded = jwt.verify(token, tokenKey) as T;
     return decoded;
   } catch (error) {
-    logger.error(JSON.stringify(error));
+    logger.error('JWT verification failed', error);
     return null;
   }
 };
 
 const signAccessToken = (object: Object, options?: SignOptions | undefined): string => {
-  return signJwt(object, keys.accessTokenPrivateKey, options);
+  return signJwt(object, keys.accessTokenPrivateKey.replace('\\n', '\n').trim(), options);
 };
 
 const signRefreshToken = (object: Object, options?: SignOptions | undefined): string => {

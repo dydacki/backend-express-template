@@ -1,8 +1,9 @@
 import argon2 from 'argon2';
 import { Request, Response } from 'express';
+import { omit } from 'lodash';
 import { getLogger } from 'log4js';
 import SessionModel from '../models/Session';
-import UserModel from '../models/User';
+import UserModel, { privateFields } from '../models/User';
 import { signAccessToken, signRefreshToken } from '../shared/jwt';
 
 const logger = getLogger();
@@ -29,10 +30,10 @@ const login = async (request: Request, response: Response): Promise<Response<any
   }
 
   try {
-    const accessToken: string = signAccessToken({ userId: user._id, userName: user.userName }, { expiresIn: '15m' });
+    const userObject = omit(user, privateFields);
+    const accessToken: string = signAccessToken(userObject, { expiresIn: '1h' });
     const session = await SessionModel.create({ userId: user._id });
     const refreshToken: string = signRefreshToken({ session: session._id }, { expiresIn: '1y' });
-
     logger.info(`Session created successfully for ${login}`);
     return response.status(200).json({ accessToken, refreshToken });
   } catch (error) {

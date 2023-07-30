@@ -8,6 +8,7 @@ import compression from 'compression';
 import { connectToDatabase } from './mongo';
 import { config } from './config/envConfig';
 import { configureLogging } from './config/log4jsConfig';
+import deserializeUser from './middleware/deserializationHandler';
 import { getErrorHandler, getLoggingHandler, requestRuleHandler } from './middleware/requestHandlers';
 import defaultRoutes from './routes/index';
 import userRoutes from './routes/user';
@@ -20,6 +21,7 @@ const startServer = () => {
   const app = express()
     .use(express.urlencoded({ extended: true }))
     .use(express.json())
+    .use(deserializeUser)
     .use(getLoggingHandler(logger))
     .use(requestRuleHandler)
     .use('/api/auth', authenticationRoutes)

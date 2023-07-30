@@ -108,4 +108,8 @@ const resetPassword = async (request: Request, response: Response): Promise<Resp
     });
 };
 
-export { createUser, requestPasswordReset, resetPassword, verifyUser };
+const getCurrentUser = (request: Request, response: Response): Response<any, Record<string, any>> => {
+  return response.send(response.locals.user);
+};
+
+export { createUser, requestPasswordReset, resetPassword, verifyUser, getCurrentUser };

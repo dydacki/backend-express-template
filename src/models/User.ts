@@ -10,6 +10,8 @@ export interface User {
   verified: boolean;
 }
 
+export const privateFields = ['password', 'verificationCode', 'passwordResetCode', '__v', 'verified'];
+
 const UserSchema: Schema = new Schema(
   {
     email: { type: String, required: true, unique: true },
