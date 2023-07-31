@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import { getLogger } from 'log4js';
 import { config } from '../config/envConfig';
@@ -20,7 +19,7 @@ const signJwt = (object: Object, tokenKey: string, options?: SignOptions | undef
     return jwt.sign({ object }, tokenKey, signOptions);
   } catch (error) {
     logger.error('JWT signing failed', error);
-    return null;
+    throw error;
   }
 };
 
@@ -29,8 +28,12 @@ const verifyJwt = <T>(token: string, tokenKey: string): T | null => {
     const decoded = jwt.verify(token, tokenKey) as T;
     return decoded;
   } catch (error) {
-    logger.error('JWT verification failed', error);
-    return null;
+    if (error?.message === 'jwt expired') {
+      logger.warn(`${error.name}: ${error.message} at ${error.expiredAt}`);
+      return null;
+    }
+
+    throw error;
   }
 };
 
@@ -39,15 +42,15 @@ const signAccessToken = (object: Object, options?: SignOptions | undefined): str
 };
 
 const signRefreshToken = (object: Object, options?: SignOptions | undefined): string => {
-  return signJwt(object, keys.refreshTokenPrivateKey, options);
+  return signJwt(object, keys.refreshTokenPrivateKey.replace('\\n', '\n').trim(), options);
 };
 
 const verifyAccessToken = <T>(token: string): T | null => {
-  return verifyJwt(token, keys.accessTokenPublicKey);
+  return verifyJwt(token, keys.accessTokenPrivateKey.replace('\\n', '\n').trim());
 };
 
 const verifyRefreshToken = <T>(token: string): T | null => {
-  return verifyJwt(token, keys.refreshTokenPublicKey);
+  return verifyJwt(token, keys.refreshTokenPrivateKey.replace('\\n', '\n').trim());
 };
 
 export { signAccessToken, signRefreshToken, verifyAccessToken, verifyRefreshToken };

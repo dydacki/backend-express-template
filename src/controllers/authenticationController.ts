@@ -30,7 +30,7 @@ const login = async (request: Request, response: Response): Promise<Response<any
   }
 
   try {
-    const userObject = omit(user, privateFields);
+    const userObject = omit(user.toJSON(), privateFields);
     const accessToken: string = signAccessToken(userObject, { expiresIn: '1h' });
     const session = await SessionModel.create({ userId: user._id });
     const refreshToken: string = signRefreshToken({ session: session._id }, { expiresIn: '1y' });
