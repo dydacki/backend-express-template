@@ -4,7 +4,7 @@ import { omit } from 'lodash';
 import { getLogger } from 'log4js';
 import SessionModel from '../models/Session';
 import UserModel, { privateFields } from '../models/User';
-import { signAccessToken, signRefreshToken } from '../shared/jwt';
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from '../shared/jwt';
 
 const logger = getLogger();
 
@@ -42,4 +42,36 @@ const login = async (request: Request, response: Response): Promise<Response<any
   }
 };
 
-export { login };
+const refreshToken = async (request: Request, response: Response): Promise<Response<any, Record<string, any>>> => {
+  const refreshToken = request.headers['x-refresh'] as string;
+  const errorMessage: string = 'Could not refresh access token';
+
+  let decoded: any;
+  try {
+    decoded = await verifyRefreshToken(refreshToken);
+  } catch (error) {
+    logger.error(JSON.stringify(error));
+    return response.status(401).json({ message: errorMessage });
+  }
+
+  try {
+    const session = await SessionModel.findById(decoded.object.session);
+    if (!session || !session.valid) {
+      logger.info(`Session not found for ${session}`);
+      return response.status(401).json({ message: errorMessage });
+    }
+    const user = await UserModel.findById(session.userId);
+    if (!user) {
+      logger.info(`User not found for ${session.userId}`);
+      return response.status(401).json({ message: errorMessage });
+    }
+    const userObject = omit(user.toJSON(), privateFields);
+    const accessToken: string = signAccessToken(userObject, { expiresIn: '1h' });
+    return response.status(200).json({ accessToken });
+  } catch (error) {
+    logger.error(JSON.stringify(error));
+    return response.status(500).json({ message: 'Error occurred while attempting to refresh a token' });
+  }
+};
+
+export { login, refreshToken };
